@@ -1,0 +1,33 @@
+<odoo>
+    <record id="view_form_role" model="ir.ui.view">
+        <field name="name">Role form</field>
+        <field name="model">nsp.role</field>
+        <field name="arch" type="xml">
+            <form string="Role">
+                <group>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="group_id" widget='many2many_tags' domain="[('category_id', '=', 'Parking')]"/> <!--# Filter out groups, only show Groups with name = Permissions domain="[('category_id', '=', 'Permissions')]"-->
+                </group>
+            </form>
+        </field>
+    </record>
+    <record id="view_list_role" model="ir.ui.view">
+        <field name='name'>Role List</field>
+        <field name='model'>nsp.role</field>
+        <field name='arch' type='xml'>
+            <list string="Role">
+                <field name='name'/>
+                <field name='group_id'/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="nsp_action_role" model="ir.actions.act_window">
+        <field name="name">Roles</field>
+        <field name="res_model">nsp.role</field>
+        <field name="view_mode">list,form</field>
+        <field name='groups_id' eval="[(4, ref('non_stop_parking.group_nsp_admin'))]"/>
+    </record>
+</odoo>

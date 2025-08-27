@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- Menu root -->
+        <menuitem id="smart_parking_menu_root" name="Non Stop Parking" sequence="1" web_icon="non_stop_parking:static/description/icon-removebg.png"/>
+
+        <!-- Submenu -->
+
+        <menuitem id="dashboard_menu" name="Trang chủ" parent="smart_parking_menu_root" action="nsp_action_dashboard" sequence='2' groups="non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager"/>
+
+        <menuitem id="profile_menu" name="Hồ sơ" parent="smart_parking_menu_root" action="action_open_profile" sequence="3" groups="base.group_user"/>
+
+        <menuitem id="tag_menu" name="Thẻ" parent="smart_parking_menu_root" action="nsp_tag_action" sequence="5" groups='non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager'/>
+
+        <menuitem id="partner_menu" name="Người dùng" parent="smart_parking_menu_root" action="nsp_partner_action" sequence="10" groups='non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager'/>
+
+        <menuitem id="vehicle_menu" name="Phương tiện" parent="smart_parking_menu_root" action="nsp_vehicle_action" sequence="15" groups='base.group_user'/>
+
+        <menuitem id="reader_menu" name="Cấu hình reader" parent="smart_parking_menu_root" action="nsp_reader_action" sequence="20" groups='non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager'/>
+
+        <menuitem id="logs_menu" name="Quản lý ra vào bãi" parent="smart_parking_menu_root" sequence="25" groups='non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager'/>
+
+        <!-- Submenu cho Vehicle Logs -->
+        <menuitem id="logs_menu_all" name="Tất cả lịch sử" parent="logs_menu" action="nsp_vehicle_logs_action" sequence="26"/>
+        <menuitem id="logs_menu_today" name="Lịch sử hôm nay" parent="logs_menu" action="nsp_vehicle_logs_action_today" sequence="27"/>
+        <menuitem id="logs_menu_anomaly" name="Lịch sử bất thường" parent="logs_menu" action="nsp_vehicle_logs_action_anomaly" sequence="28"/>
+
+        <!-- Config -->
+        <menuitem id="parking_config_menu" name="Cấu hình" parent="smart_parking_menu_root" sequence="90" groups="base.group_system"/>
+
+        <menuitem id='menu_role' sequence='10' name="Quyền truy cập" parent='parking_config_menu' action='nsp_action_role' groups='non_stop_parking.group_nsp_admin'/>
+
+        <menuitem id='menu_group' sequence='10' name='Nhóm truy cập' parent='parking_config_menu' action='nsp_groups_action' groups='non_stop_parking.group_nsp_admin'/>
+
+        <menuitem id="menu_vehicle_pricing" sequence="10" name="Quản lý giá xe" parent="parking_config_menu" action="action_vehicle_price" groups="non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager"/>
+
+        <menuitem id="menu_fees_calculator" sequence='10' name="Quản lý hóa đơn" parent="parking_config_menu" action="action_fee_calc_menu" groups='non_stop_parking.group_nsp_admin'/>
+
+        <menuitem id="menu_manage_funds" sequence="10" name="Quản lý gói nạp tiền" parent="parking_config_menu" action="action_manager_funds_pack_menu" groups="non_stop_parking.group_nsp_admin"/>
+
+        <menuitem id="menu_payment_providers" sequence="10" name="Nhà cung cấp thanh toán" parent="parking_config_menu" action="action_payment_provider" groups="non_stop_parking.group_nsp_admin"/>
+
+        <menuitem id="menu_payment_methods" sequence="10" name="Phương thức thanh toán" parent="parking_config_menu" action="action_payment_method" groups="non_stop_parking.group_nsp_admin"/>
+
+</odoo>

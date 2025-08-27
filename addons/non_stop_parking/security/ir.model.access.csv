@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nsp_role_admin,access_nsp_role_admin,model_nsp_role,group_nsp_admin,1,1,1,1
+access_nsp_role_manager,access_nsp_role_manager,model_nsp_role,group_nsp_manager,1,1,1,0
+access_nsp_role_user,access_nsp_role_user,model_nsp_role,group_nsp_users,1,0,0,0
+access_nsp_tag_manager,nsp.tag.manager,model_nsp_tag,group_nsp_manager,1,1,1,0
+access_nsp_tag_admin,nsp.tag.admin,model_nsp_tag,group_nsp_admin,1,1,1,1
+access_nsp_tag_all,nsp.tag.all,model_nsp_tag,,1,1,1,1
+access_nsp_vehicle_all,nsp.vehicle.all,model_nsp_vehicle,,1,1,1,1
+access_nsp_vehicle_logs_all,nsp.vehicle.logs.all,model_nsp_vehicle_logs,,1,1,1,1
+access_nsp_reader_all,nsp.reader.all,model_nsp_reader,,1,1,1,1
+access_res_partner_add_funds_wizard,access_res_partner_add_funds_wizard,model_res_partner_add_funds_wizard,base.group_user,1,1,1,0
+access_nsp_fund_package,nsp.fund.package,model_nsp_fund_package,group_nsp_admin,1,1,1,1
+access_nsp_vehicle_price,nsp.vehicle_price,model_nsp_vehicle_price,group_nsp_admin,1,1,1,1
+access_nsp_vehicle_price,nsp.vehicle_price,model_nsp_vehicle_price,group_nsp_manager,1,1,1,1
+access_nsp_bill_admin,access_nsp_bill,model_nsp_bill,group_nsp_admin,1,1,1,1
+access_nsp_bill_admin,access_nsp_bill,model_nsp_bill,group_nsp_manager,1,1,1,1

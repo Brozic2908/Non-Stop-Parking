@@ -1,0 +1,27 @@
+services:
+  web:
+    image: odoo:18.0
+    depends_on:
+      - db
+    ports:
+      - 8069:8069
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+    env_file:
+      - env/odoo.env
+    # command: odoo -u non_stop_parking -d NonStopParking
+  db:
+    image: postgres:17
+    ports:
+      - 5432:5432
+    env_file:
+      - env/postgresql.env
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:

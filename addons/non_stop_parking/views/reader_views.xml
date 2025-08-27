@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="nsp_reader_view_list" model="ir.ui.view">
+        <field name="name">nsp.reader.view.list</field>
+        <field name="model">nsp.reader</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách thiết bị đọc" create="1" edit="1" delete="1" multi_edit="1">
+                <header>
+                    <button name="action_discover_and_register" type="object" class="btn btn-primary" string="Phát hiện reader" display="always"></button>
+                    <button name="action_test_network" type="object" class="btn btn-primary" string="Test mạng" display="always"></button>
+                </header>
+                <field name="name" />
+                <field name="reader_id" />
+                <field name="ip_address" />
+                <field name="port" />
+                <field name="com_port" />
+                <field name="location" />
+                <field name="type" widget="badge" class="pb-1" decoration-success="type=='entry'" decoration-info="type=='exit'" decoration-primary="type=='both'"/>
+                <field name="status" widget="badge" class="pb-1" decoration-success="status=='active'" decoration-danger="status=='error'" decoration-warning="status=='maintenance'" decoration-muted="status=='inactive'"/>
+                <field name="is_connected" widget="boolean_toggle" />
+                <field name="installed_at" />
+                <field name="last_checked" />
+                <button name="action_check_status" type="object" class="btn btn-secondary" string="Kiểm tra" display="always"></button>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="nsp_reader_view_kanban" model="ir.ui.view">
+        <field name="name">nsp.reader.view.kanban</field>
+        <field name="model">nsp.reader</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="reader_id"/>
+                <field name="ip_address"/>
+                <field name="location"/>
+                <field name="port" />
+                <field name="com_port" />
+                <field name="status"/>
+                <field name="is_connected"/>
+                <field name="type" />
+                <templates>
+                    <header>
+                        <button name="action_discover_and_register" type="object" class="btn btn-primary" string="Phát hiện reader" display="always"></button>
+                        <button name="action_test_network" type="object" class="btn btn-primary" string="Test mạng" display="always"></button>
+                    </header>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top d-flex justify-content-between align-items-center">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title fw-bolder me-1">
+                                            <field name="name"></field>
+                                        </strong>
+                                        -
+                                        <small class="o_kanban_record_subtitle ms-1 fw-bold text-muted">
+                                            <t t-esc="record.reader_id"/>
+                                        </small>
+
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <div class="o_dropdown_kanban dropdown">
+                                            <a role="button" class="dropdown-toggle o-no-caret btn" data-bs-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                                <span class="fa me-1 fa-ellipsis-v"/>
+                                            </a>
+                                            <div class="dropdown-menu" role="menu">
+                                                <a t-if="widget.editable" role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                                <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <span class="fa me-1 fa-globe"/>
+                                            <t t-esc="record.ip_address + ':' + record.port"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-1">
+                                        <div class="col-6 d-flex align-items-center">
+                                            <span class="fa me-1 fa-tag"/>
+                                            <t t-if="record.type.raw_value == 'entry'">
+                                                <span class="pb-1 badge text-bg-success">Cổng vào</span>
+                                            </t>
+                                            <t t-elif="record.type.raw_value == 'exit'">
+                                                <span class="pb-1 badge text-bg-info">Cổng ra</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="pb-1 badge text-bg-primary">Cổng vào và ra</span>
+                                            </t>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <t t-if="record.is_connected.raw_value">
+                                                <span class="fa me-1 fa-circle text-success"></span>
+                                                <span class="text-success fw-bold"> Connected</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="fa me-1 fa-circle text-danger"/>
+                                                <span class="text-danger fw-bold"> Disconnected</span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <small class="text-muted">
+                                            Kiểm tra: <field name="last_checked"/>
+                                        </small>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <button name="action_check_status" type="object" class="btn btn-sm btn-primary">
+                                            <i class="fa fa-refresh"/>
+ Kiểm tra
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="nsp_reader_view_form" model="ir.ui.view">
+        <field name="name">nsp.reader.view.form</field>
+        <field name="model">nsp.reader</field>
+        <field name="arch" type="xml">
+            <form string="Thiết bị đọc thẻ">
+                <header>
+                    <button name="action_check_status" type="object" class="btn-primary" string="Kiểm tra kết nối"></button>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Hoạt động" bg_color="bg-success" invisible="status != 'active'" />
+                    <widget name="web_ribbon" title="Lỗi" bg_color="bg-danger" invisible="status != 'error'" />
+                    <widget name="web_ribbon" title="Bảo trì" bg_color="bg-warning" invisible="status != 'maintenance'" />
+                    <widget name="web_ribbon" title="Không hoạt động" bg_color="bg-muted" invisible="status != 'inactive'" />
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Tên thiết bị..."></field>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Thông tin cơ bản">
+                            <field name="reader_id" />
+                            <field name="type" widget="badge" class="pb-1" decoration-success="type=='entry'" decoration-info="type=='exit'" decoration-primary="type=='both'"/>
+                            <field name="location" />
+                            <field name="installed_at" readonly="1"/>
+                        </group>
+                        <group string="Thông tin kết nối">
+                            <field name="ip_address" />
+                            <field name="port" />
+                            <field name="com_port" />
+                            <field name="auto_discovered" />
+                            <field name="is_connected" widget="boolean_toggle"/>
+                            <field name="last_checked" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="Lịch sử đọc thẻ" string="Lịch sử đọc thẻ">
+                            <field name="vehicle_logs_ids" readonly="1">
+                                <list string="Lịch sử đọc thẻ" create="0" edit="0" delete="0" default_order="create_date desc">
+                                    <field name="create_date" string="Thời gian"/>
+                                    <field name="plate_number" string="Biển số"/>
+                                    <field name="partner_name" string="Người dùng"/>
+                                    <field name="direction" string="Hướng" widget="badge" class="pb-1" decoration-success="direction=='in'" decoration-info="direction=='out'"/>
+                                    <field name="gate_name" string="Cổng"/>
+                                    <field name="anomaly_warning" widget="badge" class="pb-1" decoration-warning="is_anomaly"/>
+                                    <field name="notes" string="Ghi chú"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="nsp_reader_view_search" model="ir.ui.view">
+        <field name="name">nsp.reader.view.search</field>
+        <field name="model">nsp.reader</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm Reader">
+                <field name="name"/>
+                <field name="reader_id"/>
+                <field name="ip_address"/>
+                <field name="location"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action cho Reader -->
+    <record id="nsp_reader_action" model="ir.actions.act_window">
+        <field name="name">Quản lý thiết bị</field>
+        <field name="res_model">nsp.reader</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có reader nào được cấu hình
+            </p>
+            <p>
+                Nhấp vào <b>Phát hiện Reader</b> để tự động tìm kiếm và đăng ký reader trong mạng LAN.
+            </p>
+            <p>
+                Hoặc tạo reader mới bằng cách nhấp <b>Tạo</b> để cấu hình thủ công.
+            </p>
+        </field>
+    </record>
+
+    <!-- Cron Jobs -->
+    <record id="ir_cron_check_readers_status" model="ir.cron">
+        <field name="name">Kiểm tra trạng thái thiết bị</field>
+        <field name="model_id" ref="model_nsp_reader"/>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="state">code</field>
+        <field name="code">model._cron_check_readers_status()</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="ir_cron_discover_readers" model="ir.cron">
+        <field name="name">Phát hiện Reader tự động</field>
+        <field name="model_id" ref="model_nsp_reader"/>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="state">code</field>
+        <field name="code">model._cron_discover_readers()</field>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>

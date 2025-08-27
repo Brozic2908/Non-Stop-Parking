@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- RFID Reader Widget Template -->
+    <t t-name="non_stop_parking.RFIDReaderWidget" owl="1">
+        <div class="rfid-reader-widget d-flex gap-2 align-items-center">
+            <!-- Connection Controls -->
+            <div class="connection-controls d-flex gap-2">
+                <!-- Primary Connection Button -->
+                <button t-if="!state.isConnected" type="button" class="btn btn-sm" t-att-class="connectionButtonClass" t-att-disabled="state.connectionStatus === 'connecting'" t-on-click="connectToReader" title="Kết nối với RFID Reader">
+                    <i class="fa fa-plug me-1"/>
+                    <t t-esc="connectionButtonText"/>
+                </button>
+
+                <!-- Disconnect Button -->
+                <button t-else="" type="button" class="btn btn-sm btn-danger" t-on-click="disconnectFromReader" title="Ngắt kết nối RFID Reader">
+                    <i class="fa fa-times me-1"/>
+                    Ngắt kết nối
+                </button>
+
+                <!-- Change Device Button (when connected) -->
+                <button t-if="state.isConnected" type="button" class="btn btn-sm btn-outline-primary" t-on-click="changeDevice" title="Thay đổi thiết bị RFID">
+                    <i class="fa fa-exchange me-1"/>
+                    Đổi thiết bị
+                </button>
+            </div>
+
+            <!-- Connection Status Badge -->
+            <div class="connection-status">
+                <!-- Connected Status -->
+                <span t-if="state.connectionStatus === 'connected'" class="badge badge-success fs-6" title="Đã kết nối thành công">
+                    <i class="fa fa-check-circle me-1"/>
+                    Đã kết nối: <t t-esc="state.readerInfo?.readerId"/>
+                <span t-if="state.readerInfo?.comPort" class="ms-1">
+                        (                    <t t-esc="state.readerInfo.comPort"/>
+)
+                </span>
+            </span>
+
+            <!-- Connecting Status -->
+            <span t-elif="state.connectionStatus === 'connecting'" class="badge badge-warning fs-6" title="Đang thực hiện kết nối">
+                <i class="fa fa-spinner fa-spin me-1"/>
+                    Đang kết nối...
+            </span>
+
+            <!-- Disconnected Status -->
+            <span t-else="" class="badge badge-secondary fs-6" title="Chưa kết nối với thiết bị">
+                <i class="fa fa-times-circle me-1"/>
+                    Chưa kết nối
+            </span>
+
+            <!-- Scanning Indicator -->
+            <span t-if="state.isScanning" class="badge badge-info fs-6 ms-2" title="Đang quét thẻ RFID">
+                <i class="fa fa-spinner fa-spin me-1"/>
+                    Đang quét...
+            </span>
+        </div>
+    </div>
+
+    <!-- Device Selection Modal -->
+    <div t-if="state.showDeviceModal" class="modal d-block rfid-device-modal" style="background-color: rgba(0,0,0,0.5);" t-on-click="closeDeviceModal">
+        <div class="modal-dialog modal-lg" t-on-click.stop="">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fa fa-search me-2 text-primary"/>
+                            Chọn thiết bị RFID Reader
+                    </h5>
+                    <button type="button" class="btn-close" t-on-click="closeDeviceModal" aria-label="Đóng"/>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body pb-0">
+                    <!-- Loading State -->
+                    <div t-if="state.isDiscovering" class="text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Đang tìm kiếm...</span>
+                        </div>
+                        <h6 class="text-muted">Đang quét thiết bị trên mạng...</h6>
+                        <p class="text-muted small">
+                                Quá trình này có thể mất vài giây để hoàn thành
+                        </p>
+                    </div>
+
+                    <!-- No Devices Found -->
+                    <div t-elif="!state.isDiscovering and state.availableDevices.length === 0" class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="fa fa-exclamation-triangle fa-4x text-warning mb-3"/>
+                            <h5>Không tìm thấy thiết bị nào</h5>
+                        </div>
+                        <div class="alert alert-info text-start">
+                            <h6 class="alert-heading">
+                                <i class="fa fa-info-circle me-2"/>
+                                    Hãy đảm bảo:
+                            </h6>
+                            <ul class="mb-0">
+                                <li>RFID Reader Service đang chạy trên localhost</li>
+                                <li>Cổng mạng không bị chặn bởi firewall</li>
+                                <li>Thiết bị RFID được kết nối đúng cách</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Device List -->
+                    <div t-else="" class="device-list">
+                        <div class="row g-3">
+                            <div t-foreach="state.availableDevices" t-as="device" t-key="device.readerId + '_' + device.comPort" class="col-12">
+                                <div class="card device-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <!-- Device Information -->
+                                            <div class="flex-grow-1 me-3">
+                                                <h6 class="card-title">
+                                                    <i class="fa fa-microchip me-2 text-primary"/>
+                                                    <t t-esc="device.readerId"/>
+                                                </h6>
+
+                                                <div class="device-details">
+                                                    <!-- Network Address -->
+                                                    <div class="text-muted small">
+                                                        <i class="fa fa-globe me-2"/>
+                                                        <strong>Địa chỉ:</strong>
+                                                        <span class="ms-1">
+                                                            <t t-esc="device.host"/>
+:                                                            <t t-esc="device.port"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- COM Port -->
+                                                    <div t-if="device.comPort" class="text-muted small">
+                                                        <i class="fa fa-usb me-2"/>
+                                                        <strong>COM Port:</strong>
+                                                        <span class="ms-1">
+                                                            <t t-esc="device.comPort"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- System Status -->
+                                                    <div class="mb-0">
+                                                        <i class="fa fa-info-circle me-2 text-muted"/>
+                                                        <strong class="text-muted small">Trạng thái hệ thống:</strong>
+                                                        <span t-if="device.isRegisteredInSystem" class="badge bg-success text-white ms-2">
+                                                            <i class="fa fa-check me-1"/>
+                                                                Đã đăng ký
+                                                        </span>
+                                                        <span t-else="" class="badge bg-warning text-dark ms-2">
+                                                            <i class="fa fa-exclamation-triangle me-1"/>
+                                                                Chưa đăng ký
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Device Actions -->
+                                            <div class="device-actions d-flex flex-column gap-1">
+                                                <!-- Test Button -->
+                                                <button type="button" class="btn btn-sm btn-outline-info flex-fill" t-att-disabled="state.testingDevice === device.readerId" t-on-click="() => this.testDevice(device)" title="Kiểm tra kết nối thiết bị">
+                                                    <i t-if="state.testingDevice === device.readerId" class="fa fa-spinner fa-spin me-1"/>
+                                                    <i t-else="" class="fa fa-vial me-1"/>
+                                                    <span t-if="state.testingDevice === device.readerId">
+                                                            Đang test...
+                                                    </span>
+                                                    <span t-else="">Test</span>
+                                                </button>
+
+                                                <!-- Configuration Button -->
+                                                <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" t-att-disabled="!device.isRegisteredInSystem" t-on-click="() => this.showDeviceConfig(device)" t-att-title="device.isRegisteredInSystem ? 'Cấu hình thiết bị' : 'Thiết bị chưa được đăng ký'">
+                                                    <i class="fa fa-cog me-1"/>
+                                                        Cấu hình
+                                                </button>
+
+                                                <!-- Select Button -->
+                                                <button type="button" class="btn btn-sm btn-primary flex-fill" t-on-click="() => this.selectDevice(device)" title="Chọn và kết nối thiết bị này">
+                                                    <i class="fa fa-check me-1"/>
+                                                        Chọn thiết bị
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary me-2" t-on-click="closeDeviceModal">
+                        <i class="fa fa-times me-1"/>
+                            Đóng
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" t-on-click="showDeviceSelectionModal" t-att-disabled="state.isDiscovering" title="Quét lại để tìm thiết bị mới">
+                        <i class="fa fa-refresh me-1"/>
+                            Quét lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+</templates>

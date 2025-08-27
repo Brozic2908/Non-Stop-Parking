@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nsp_profile_view_form" model="ir.ui.view">
+        <field name="name">res.partner.profile.view.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">0</attribute>
+                <attribute name="delete">0</attribute>
+                <attribute name="edit">0</attribute>
+            </xpath>
+
+            <xpath expr="//sheet" position="inside">
+                <header position="inside">
+                    <!-- RFID Reader Widget -->
+                    <div class="rfid-reader-header">
+                        <widget name="rfid_reader"/>
+                    </div>
+                </header>
+
+                <xpath expr="//field[@name='image_1920']" position="after">
+                    <div class="row">
+                        <group class="col-9">
+                            <field name="partner_tag_id" readonly="1" string="Thẻ thành viên" placeholder="Quét ID thẻ tại đây..."/>
+                        </group>
+                        <group class="col-3">
+                            <button name="action_refresh_temp_tag_partner" type="object" class="btn-primary btn-sm" string="Lấy thẻ mới" invisible="partner_tag_id"/>
+                            <button name="action_revoke_tag" type="object" class="btn-danger btn-sm" string="Thu hồi thẻ" invisible="not partner_tag_id"/>
+                        </group>
+                    </div>
+                </xpath>
+
+                <xpath expr="//notebook" position="inside">
+                    <page name="vehicles" string="Phương tiện">
+                        <field name="vehicle_ids">
+                            <list string="Danh sách phương tiện" open_form_view="1">
+                                <field name="name"/>
+                                <field name="plate_number"/>
+                                <field name="brand"/>
+                                <field name="vehicle_type"/>
+                                <field name="create_date"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page name="logs" string="Lịch sử ra vào">
+                        <field name="partner_logs_ids">
+                            <list string="Lịch sử ra vào" create="0" edit="0" delete="0" class="text-center" default_order="create_date desc">
+                                <field name="create_date" string="Thời gian" />
+                                <field name="plate_number" string="Xe" />
+                                <field name="partner_name" string="Người dùng" />
+                                <field name="direction" string="Hướng" widget="badge" decoration-success="direction=='in'" decoration-info="direction=='out'"/>
+                                <field name="gate_name" string="Cổng" />
+                                <field name="reader_device" string="Thiết bị đọc" />
+                                <field name="anomaly_warning" widget="badge" decoration-warning="is_anomaly" />
+                                <field name="photo_binary" widget="image" class="w-50 h-50" string="Ảnh"/>
+                                <field name="notes" string="Ghi chú"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page name="access_rights" widget="many2many" options="{'no_create': True}" string="Quyền truy cập" groups="non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager">
+                        <field name="roles">
+                            <list string="Danh sách quyền truy cập" open_form_view='1'>
+                                <field name="name"/>
+                                <field name="group_id"/>
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_open_profile" model="ir.actions.act_window">
+        <field name="name">Hồ sơ người dùng</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

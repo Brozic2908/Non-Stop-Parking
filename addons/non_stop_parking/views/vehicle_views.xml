@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- list View -->
+    <record id="nsp_vehicle_view_list" model="ir.ui.view">
+        <field name="name">nsp.vehicle.view.list</field>
+        <field name="model">nsp.vehicle</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách phương tiện" create="0">
+                <field name="name"></field>
+                <field name="plate_number"></field>
+                <field name="brand"></field>
+                <field name="vehicle_type"></field>
+                <field name="owner_partner_id"></field>
+                <field name="current_status" widget="badge" decoration-success="current_status=='inside'" decoration-info="current_status=='outside'" decoration-warning="current_status=='unknown'"/>
+                <field name="create_date" string="Ngày tạo"></field>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="nsp_vehicle_view_form" model="ir.ui.view">
+        <field name="name">nsp.vehicle.view.form</field>
+        <field name="model">nsp.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Phương tiện">
+                <header>
+                    <field name="current_status" widget="badge" decoration-success="current_status=='inside'" decoration-info="current_status=='outside'" decoration-warning="current_status=='unknown'"/>
+                    <!-- RFID Reader Widget -->
+                    <div class="rfid-reader-header">
+                        <widget name="rfid_reader"/>
+                    </div>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Honda Wave" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="plate_number" required="1"/>
+                            <field name="owner_partner_id"></field>
+                            <div class="row">
+                                <group class="col-9">
+                                    <field name="vehicle_tag_id" readonly="1" string="Thẻ phương tiện" placeholder="Quét ID thẻ tại đây..."/>
+                                </group>
+                                <group class="col-3">
+                                    <button name="action_refresh_temp_tag_vehicle" type="object" class="btn-primary btn-sm" string="Lấy thẻ mới" invisible="vehicle_tag_id"/>
+                                    <button name="action_revoke_tag" type="object" class="btn-danger btn-sm" string="Thu hồi thẻ" invisible="not vehicle_tag_id"/>
+                                </group>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="brand"/>
+                            <field name="color"/>
+                            <field name="vehicle_type"/>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="logs" string="Lịch sử ra vào">
+                            <field name="vehicle_logs_ids">
+                                <list string="Lịch sử ra vào" create="0" edit="0" delete="0" class="text-center" default_order="create_date desc">
+                                    <field name="create_date" string="Thời gian" />
+                                    <field name="plate_number" string="Xe" />
+                                    <field name="partner_name" string="Người dùng" />
+                                    <field name="direction" string="Hướng" widget="badge" decoration-success="direction=='in'" decoration-info="direction=='out'"/>
+                                    <field name="gate_name" string="Cổng" />
+                                    <field name="reader_device" string="Thiết bị đọc" />
+                                    <field name="anomaly_warning" widget="badge" decoration-warning="is_anomaly" />
+                                    <field name="photo_binary" widget="image" class="w-50 h-50" string="Ảnh"/>
+                                    <field name="notes" string="Ghi chú"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Thông tin người dùng" name="owner">
+                            <field name="owner_partner_id" readonly="1">
+                                <list string="Danh sách người dùng" class="text-center" default_order="create_date desc">
+                                    <field name="name"/>
+                                    <field name="citizen_id"/>
+                                    <field name="partner_tag_id"/>
+                                    <field name="create_date"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="nsp_vehicle_view_search" model="ir.ui.view">
+        <field name="name">nsp.vehicle.view.search</field>
+        <field name="model">nsp.vehicle</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm phương tiện">
+                <field name="plate_number"/>
+                <field name="brand"/>
+                <field name="vehicle_type"/>
+                <field name="owner_partner_id"/>
+                <field name="vehicle_tag_id"/>
+                <filter string="Ô tô" name="car" domain="[('vehicle_type', '=', 'car')]"/>
+                <filter string="Xe máy" name="motorcycle" domain="[('vehicle_type', '=', 'motorcycle')]"/>
+                <filter string="Xe đạp" name="bicycle" domain="[('vehicle_type', '=', 'bicycle')]"/>
+                <filter string="Xe tải" name="truck" domain="[('vehicle_type', '=', 'truck')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Loại xe" name="group_type" context="{'group_by': 'vehicle_type'}"/>
+                    <filter string="Chủ sở hữu" name="group_owner" context="{'group_by': 'owner_partner_id'}"/>
+                    <filter string="Ngày tạo" name="group_created" context="{'group_by': 'create_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="nsp_vehicle_action" model="ir.actions.act_window">
+        <field name="name">Quản lý phương tiện</field>
+        <field name="res_model">nsp.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Đăng ký phương tiện đầu tiên của bạn!
+            </p>
+            <p>
+                Mỗi phương tiện có thể được gắn với một hoặc nhiều thẻ RFID để nhận diện tự động.
+            </p>
+        </field>
+    </record>
+</odoo>

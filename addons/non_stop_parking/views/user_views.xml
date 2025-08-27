@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- kanban view -->
+    <record id="res_partner_view_kanban" model="ir.ui.view">
+        <field name="name">res.partner.view.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record" style="display: flex; gap: 10px; flex-direction: row; margin: 0;">
+                            <div class="d-flex align-items-center">
+                                <div class="o_kanban_image" style="width: 4.5rem; object-fit: cover;">
+                                    <img loading="lazy" t-att-src="kanban_image('res.partner', 'image_1920', record.id.value)" class="img img-fluid rounded-circle"/>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_details p-0">
+                                <strong t-esc="record.name.value"/>
+                                <div>
+                                    <span>
+                                        <i class="fa fa-envelope text-primary" style="margin-right: 0.2rem; width: 1rem;"/>
+                                        <t t-esc="record.email.value"/>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span>
+                                        <i class="fa fa-phone text-primary" style="margin-right: 0.2rem; font-size: 1rem; width: 1rem;"/>
+                                        <t t-esc="record.phone.value"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- list view -->
+    <record id="nsp_partner_view_list" model="ir.ui.view">
+        <field name="name">res.partner.view.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách người dùng" create="1" delete="0" multi_edit="1" open_form_view="1">
+                <field name="name"></field>
+                <field name="email"></field>
+                <field name="phone"></field>
+                <field name="citizen_id"/>
+                <field name="create_date" string="Ngày tạo"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="nsp_partner_view_form" model="ir.ui.view">
+        <field name="name">res.partner.view.form.nsp</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"></field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="replace">
+                <form string="Người dùng bãi đỗ xe">
+                    <header position="inside">
+                        <!-- RFID Reader Widget -->
+                        <div class="rfid-reader-header">
+                            <widget name="rfid_reader"/>
+                        </div>
+                    </header>
+                    <sheet>
+                        <field name="image_1920" widget='image' class="oe_avatar" options='{"zoom": true, "preview_image": "avatar_128"}'/>
+
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Nguyễn Văn A" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="email" string="Địa chỉ Email" widget="email"/>
+                                <field name="phone" widget="phone"/>
+                                <field name="citizen_id" string="CCCD/CMND"/>
+                                <div class="row">
+                                    <group class="col-9">
+                                        <field name="partner_tag_id" readonly="1" string="Thẻ thành viên" placeholder="Quét ID thẻ tại đây..."/>
+                                    </group>
+                                    <group class="col-3">
+                                        <button name="action_refresh_temp_tag_partner" type="object" class="btn-primary btn-sm" string="Lấy thẻ mới" invisible="partner_tag_id"/>
+                                        <button name="action_revoke_tag" type="object" class="btn-danger btn-sm" string="Thu hồi thẻ" invisible="not partner_tag_id"/>
+                                    </group>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="create_date" string="Ngày tạo" readonly="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page name="vehicles" string="Phương tiện">
+                                <field name="vehicle_ids">
+                                    <list string="Danh sách phương tiện" open_form_view="1">
+                                        <field name="name"/>
+                                        <field name="plate_number"/>
+                                        <field name="brand"/>
+                                        <field name="vehicle_type"/>
+                                        <field name="create_date"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page name="contact_info" string="Thông tin liên hệ">
+                                <group>
+                                    <group>
+                                        <field name="street" placeholder="Địa chỉ"/>
+                                        <field name="city"/>
+                                        <field name="state_id"/>
+                                        <field name="country_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="website" widget="url"/>
+                                        <field name="category_id" widget="many2many_tags"/>
+                                        <field name="comment" placeholder="Ghi chú thêm..."/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page name="account_info" string="Tài khoản" invisible="not user_ids">
+                                <group>
+                                    <field name="user_ids" readonly="1">
+                                        <list>
+                                            <field name="login"/>
+                                            <field name="active"/>
+                                            <field name="roles"/>
+                                        </list>
+                                    </field>
+                                </group>
+                            </page>
+                            <page name="logs" string="Lịch sử ra vào">
+                                <field name="partner_logs_ids">
+                                    <list string="Lịch sử ra vào" create="0" edit="0" delete="0" class="text-center" default_order="create_date desc">
+                                        <field name="create_date" string="Thời gian" />
+                                        <field name="plate_number" string="Xe" />
+                                        <field name="partner_name" string="Người dùng" />
+                                        <field name="direction" string="Hướng" widget="badge" decoration-success="direction=='in'" decoration-info="direction=='out'"/>
+                                        <field name="gate_name" string="Cổng" />
+                                        <field name="reader_device" string="Thiết bị đọc" />
+                                        <field name="anomaly_warning" widget="badge" decoration-warning="is_anomaly" />
+                                        <field name="photo_binary" widget="image" class="w-50 h-50" string="Ảnh"/>
+                                        <field name="notes" string="Ghi chú"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page name="access_rights" string="Quyền truy cập" groups="non_stop_parking.group_nsp_admin,non_stop_parking.group_nsp_manager">
+                                <field name="roles">
+                                    <list string="Danh sách quyền truy cập">
+                                        <field name="name"/>
+                                        <field name="group_id"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="nsp_partner_view_search" model="ir.ui.view">
+        <field name="name">res.partner.view.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm người dùng">
+                <field name="name"></field>
+                <field name="email"></field>
+                <field name="phone"></field>
+                <group string="Nhóm theo" expand="0">
+                    <filter name="group_created" string="Ngày tạo" context="{'group_by': 'create_date'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="nsp_partner_action" model="ir.actions.act_window">
+        <field name="name">Quản lý người dùng</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[(5,0,0),
+        (0,0, {'view_mode':'kanban', 'view_id': ref('res_partner_view_kanban')}),
+        (0,0, {'view_mode':'list', 'view_id': ref('nsp_partner_view_list')}),
+        (0,0, {'view_mode':'form', 'view_id': ref('nsp_partner_view_form')})]"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                    Tạo người dùng đầu tiên của bạn!
+            </p>
+            <p>
+                    Người dùng có thể sở hữu nhiều thẻ RFID và phương tiện. 
+            </p>
+        </field>
+        <field name='groups_id' eval="[(4, ref('non_stop_parking.group_nsp_admin')), (4, ref('non_stop_parking.group_nsp_manager'))]"/>
+    </record>
+</odoo>

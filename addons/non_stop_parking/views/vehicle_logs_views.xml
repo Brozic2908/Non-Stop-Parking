@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view - Danh sách lịch sử ra vào -->
+    <record id="nsp_vehicle_logs_view_list" model="ir.ui.view">
+        <field name="name">nsp.vehicle.logs.view.list</field>
+        <field name="model">nsp.vehicle.logs</field>
+        <field name="arch" type="xml">
+            <list string="Lịch sử ra vào bãi xe" create="0" edit="0" delete="0" default_order="create_date desc" js_class="parking_logs_list">
+                <field name="create_date" string="Thời gian" />
+                <field name="parking_time_display" string="Thời gian đỗ xe" invisible="direction == 'in'" />
+                <field name="plate_number" string="Xe" />
+                <field name="partner_name" string="Người dùng" />
+                <field name="direction" string="Hướng" widget="badge" decoration-success="direction=='in'" decoration-info="direction=='out'"/>
+                <field name="gate_name" string="Cổng" />
+                <field name="reader_device" string="Thiết bị đọc" />
+                <field name="anomaly_warning" widget="badge" decoration-warning="is_anomaly" />
+                <field name="photo_binary" widget="image" class="w-50 h-50" string="Ảnh"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View cho vehicle logs -->
+    <record id="nsp_vehicle_logs_view_form" model="ir.ui.view">
+        <field name="name">nsp.vehicle.logs.view.form</field>
+        <field name="model">nsp.vehicle.logs</field>
+        <field name="arch" type="xml">
+            <form string="Chi tiết lịch sử ra vào" create="0" delete="0" edit="0">
+                <header>
+                    <field name="anomaly_warning" help="Đánh dấu các log bất thường" widget="badge" decoration-warning="is_anomaly" style="font-size: 1.2rem;"/>
+                    <field name="direction" string="Hướng" widget="badge" decoration-success="direction=='in'" decoration-info="direction=='out'" style="font-size: 1.2rem;"/>
+                    <field name="parking_time_display" string="Thời gian đỗ" widget="badge" decoration-info="parking_time > 0" invisible="direction=='in' or parking_time == 0" style="font-size: 1.2rem;"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_vehicle" class="oe_stat_button" icon="fa-solid fa-car" type="object" string="Xem phương tiện" invisible="not vehicle_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Xem xe</span>
+                            </div>
+                        </button>
+                        <button name="action_view_partner" class="oe_stat_button" icon="fa-solid fa-user" type="object" string="Xem người dùng" invisible="not partner_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Xem người dùng</span>
+                            </div>
+                        </button>
+                        <button name="action_view_entry_log" class="oe_stat_button" icon="fa-solid fa-clock-o" type="object" string="Log vào bãi" invisible="not entry_log_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Log vào bãi</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Tên hiển thị -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1" />
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group col="1">
+                            <group string="Thông tin cơ bản">
+                                <field name="create_date" readonly="1" string="Thời gian ghi nhận" widget="datetime"/>
+                                <field name="direction" widget="radio" options="{'horizontal': true}"/>
+                                <field name="vehicle_id" readonly="1" string="Xe" />
+                                <field name="tag_id" readonly="1" string="Thẻ" />
+                                <field name="partner_id" readonly="1" string="Người dùng" />
+                            </group>
+                            <group string="Thông tin thời gian đỗ" invisible="direction=='in'">
+                                <field name="parking_time" readonly="1" string="Thời gian đỗ (giờ)" widget="float_time"/>
+                                <field name="parking_time_display" readonly="1" string="Thời gian đỗ" />
+                                <field name="entry_log_id" readonly="1" string="Log vào bãi tương ứng" />
+                            </group>
+                            <group string="Thông tin thiết bị">
+                                <field name="gate_name" readonly="1" string="Cổng" />
+                                <field name="reader_device" readonly="1" string="Thiết bị đọc" />
+                            </group>
+                        </group>
+                        <group string="Hình ảnh" col="2">
+                            <field name="photo_binary" readonly="1" string="Ảnh" widget="image" />
+                        </group>
+                    </group>
+
+                    <group string="Ghi chú và thông tin bổ sung">
+                        <field name="notes" nolabel="1" placeholder="Ghi chú về lần ra/vào này..."/>
+                    </group>
+
+                    <group string="Phát hiện bất thường" invisible="not is_anomaly">
+                        <field name="anomaly_reason" readonly="1" string="Lý do bất thường" nolabel="1" widget="text"/>
+                    </group>
+
+                    <group string="Hình ảnh" invisible="not is_anomaly">
+                        <div class="o_field_image">
+                            <label for="last_photo">Lần cuối</label>
+                            <field id="last_photo" string="Lần cuối" name="photo_binary" widget="image" readonly="1" style="width: 300px; height: 200px;"/>
+                            <label for="new_photo">Lần này</label>
+                            <field id="new_photo" string="Lần này" name="photo_binary" widget="image" readonly="1" style="width: 300px; height: 200px;"/>
+                        </div>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view cho vehicle logs -->
+    <record id="nsp_vehicle_logs_view_search" model="ir.ui.view">
+        <field name="name">nsp.vehicle.logs.view.search</field>
+        <field name="model">nsp.vehicle.logs</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm lịch sử ra vào">
+                <field name="plate_number" string="Biển số xe"></field>
+                <field name="partner_name" string="Người dùng"/>
+                <field name="tag_code" string="Mã thẻ"/>
+                <field name="gate_name" string="Cổng"/>
+                <field name="reader_device" string="Thiết bị"/>
+                <field name="notes" string="Ghi chú"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action view cho vehicle logs -->
+    <record id="nsp_vehicle_logs_action" model="ir.actions.act_window">
+        <field name="name">Lịch sử ra vào bãi xe</field>
+        <field name="res_model">nsp.vehicle.logs</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có lịch sử ra vào nào!
+            </p>
+            <p>
+                Lịch sử ra vào sẽ được ghi nhận tự động khi có xe đi qua cổng với thẻ RFID.
+            </p>
+        </field>
+    </record>
+
+    <!-- Aciton View cho Vehicle Logs - Chỉ hiển thị hôm nay -->
+    <record id="nsp_vehicle_logs_action_today" model="ir.actions.act_window">
+        <field name="name">Lịch sử ra vào hôm nay</field>
+        <field name="res_model">nsp.vehicle.logs</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[
+            ('create_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
+            ('create_date', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))
+            ]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                    Chưa có lịch sử ra vào nào hôm nay!
+            </p>
+            <p>
+                    Lịch sử ra vào sẽ được ghi nhận tự động khi có xe đi qua cổng với thẻ RFID.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action View cho Vehicle Logs - Chỉ hiển thị bất thường -->
+    <record id="nsp_vehicle_logs_action_anomaly" model="ir.actions.act_window">
+        <field name="name">Lịch sử ra vào bất thường</field>
+        <field name="res_model">nsp.vehicle.logs</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_anomaly', '=', True)]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                    Chưa có lịch sử ra vào nào hôm nay!
+            </p>
+            <p>
+                    Lịch sử ra vào sẽ được ghi nhận tự động khi có xe đi qua cổng với thẻ RFID.
+            </p>
+        </field>
+    </record>
+</odoo>
